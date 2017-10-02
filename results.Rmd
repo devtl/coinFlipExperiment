@@ -1,0 +1,39 @@
+---
+title: "Experiment Results"
+output: pdf_document
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(reshape2)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+
+```
+
+The following table lists the results of each team member independently flipping a fair coin 20 times. An additional sample created from rbinom() is included to compare R's psuedo-random algorithm:
+
+```{r}
+resultsdf <- tibble(
+  name = c("Katelyn", "Laura", "Devin", "Cole", "Lee", "R Simulation"),
+  heads = c(13, 13, 11, NaN, NaN, 9),
+  tails = c(7, 7, 9, NaN, NaN, 11),
+  percentHeads = heads/20,
+  trialError = sqrt((10 - heads)^2)
+)
+
+sampleMean <- mean(resultsdf$heads)
+sampleErr <- sqrt(((10 - sampleMean)^2)/6)
+
+knitr::kable(resultsdf, align = c('c','c','c','c','c','c'), format="pandoc", caption = "Table of Results (0 = Tails, 1 = Heads)")
+
+ggplot(resultsdf, mapping = aes(name, heads)) + geom_bar(stat = "identity", fill = "steelblue") + labs(x=NULL, y="Number of Heads", title = "Head Counts per Sample") + geom_hline(yintercept = 10, colour = "light gray", size = 1) + theme_minimal()
+
+summary(resultsdf$heads)
+```
+
+Here we are interested in the number of heads that appear and each of the 6 independent trials are binomially distributed with $n = 20$ and $p= 0.5$. Our sample mean $\bar{x}=$ `r sampleMean` and sample error is $\sigma_{\bar{x}} =$ `r sampleErr`.
