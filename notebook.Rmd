@@ -51,4 +51,6 @@ sampleMean <- mean(sampledf$avgs)
 sampleError <- sqrt(((10 - sampleMean)^2)/25)
 ```
 
-Our sample mean is `r sampleMean` and standard error is `r sampleError` for this experiment.
+### Our sample mean is `r sampleMean` and standard error is `r sampleError` for this experiment.
+
+
