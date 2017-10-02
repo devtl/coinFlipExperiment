@@ -1,0 +1,54 @@
+---
+title: "Experiment: Flipping a fair coin"
+output: html_notebook
+---
+
+```{r include=FALSE}
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE
+)
+
+```
+
+###Analysis of flipping a fair coin twenty times.
+
+For this experiment we will flip a fair coin 20 times and count the number of times it lands on heads. At such a low number of observations we would expect to see a good amount of variability from the mean value of 10. To measure this variability we will take 5 samples
+
+```{r}
+df <- tibble(n = seq(1:20),
+             sample1 = rbinom(20, 1, 0.5),
+             sample2 = rbinom(20, 1, 0.5),
+             sample3 = rbinom(20, 1, 0.5),
+             sample4 = rbinom(20, 1, 0.5),
+             sample5 = rbinom(20, 1, 0.5))
+
+knitr::kable(df, align = c('c','c','c','c','c','c'), format="pandoc", caption = "Table of Results (0 = Tails, 1 = Heads)")
+```
+
+### Sample Statistics
+
+```{r}
+library(reshape2)
+groupdf <- melt(df[c("sample1","sample2","sample3","sample4","sample5")], variable.name = "samplen", id.vars = 1)
+
+ggplot(groupdf, mapping = aes(samplen, value)) + geom_bar(stat = "identity", fill = "steelblue") + labs(x=NULL, y="Number of Heads", title = "Head Counts per Sample") + geom_hline(yintercept = 10, colour = "light gray", size = 1) + theme_minimal()
+
+summary(df[2:6])
+```
+
+The barplot above reveals that samples 1, 2, and 3 contain less head counts than the expected value, sample 4 has more than, and sample 3 meets the expected value for the number of heads in twenty flips of a fair coin.
+
+```{r}
+sampledf <- tibble(n = seq(1:5),
+                   total = apply(df[2:6], 2, sum),
+                   avgs = apply(df[2:6], 2, mean)
+                   )
+
+sampleMean <- mean(sampledf$avgs)
+sampleError <- sqrt(((10 - sampleMean)^2)/25)
+```
+
+Our sample mean is `r sampleMean` and standard error is `r sampleError` for this experiment.
