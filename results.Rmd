@@ -15,25 +15,60 @@ knitr::opts_chunk$set(
 
 ```
 
-The following table lists the results of each team member independently flipping a fair coin 20 times. An additional sample created from rbinom() is included to compare R's psuedo-random algorithm:
+## Introduction
+
+Many times published experiments are not repeated due to various reasons (ie. limited resources, not as distinguished as original results, etc.). In addition, the experiments that are published in peer-reviewed journals are sometimes biased by the researcher's need for "significant results" instead of those that agree with natural law or known experiments which are usually considered "boring" or "uninteresting" and are subject to the file-drawer effect. This creates a problem of having too many remarkable studies published with non-realistic outcomes.
+
+We've created a simple experiment to observe the variability of a single sample experiment versus multiple samples to highlight the importance of test reproduction in scientific experimentation. The experiment will be to flip a fair coin 20 times and count the number of times it lands on heads, $X \sim Binomial(20, 0.5)$. At such a low number of observations we would expect to see a good amount of variability from the mean value of 10. Each team member will individually repeat the experiment independently and then we will compare our individual results with that of the overall team outcome.
+
+## Experiment
+### Raw Data
+
+The following table lists the results of each team member independently flipping a fair coin 20 times. An additional sample created from rbinom() is included using R's psuedo-random algorithm:
 
 ```{r}
 resultsdf <- tibble(
   name = c("Katelyn", "Laura", "Devin", "Cole", "Lee", "R Simulation"),
-  heads = c(13, 13, 11, NaN, NaN, 9),
-  tails = c(7, 7, 9, NaN, NaN, 11),
+  heads = c(13, 13, 11, 12, 9, 9),
+  tails = c(7, 7, 9, 8, 11, 11),
   percentHeads = heads/20,
-  trialError = sqrt((10 - heads)^2)
+  sampleError = sqrt((10 - heads)^2)
 )
 
-sampleMean <- mean(resultsdf$heads)
-sampleErr <- sqrt(((10 - sampleMean)^2)/6)
+plotdf <- resultsdf %>% select(name, heads, tails) %>% melt(id.vars = "name")
 
-knitr::kable(resultsdf, align = c('c','c','c','c','c','c'), format="pandoc", caption = "Table of Results (0 = Tails, 1 = Heads)")
+ggplot(plotdf, mapping = aes(variable, value, fill = name)) + geom_bar(stat = "identity") + geom_hline(yintercept = 10, colour = "light gray", size = 1) + theme_minimal() + facet_wrap(~name) + theme(legend.position = "right", strip.text.x = element_blank())
 
+knitr::kable(resultsdf, align = c('c','c','c','c','c','c'), format="pandoc", caption = "Summary of Results")
+```
+
+
+The individual samples have errors that range from 1 to 3 counts. If Katelyn and Laura were to individually publish their findings, it would seem like they have found significantly different results than what was to be expected. Also, we see that R's psuedo-random generator produced results indistinguishable from an actual team member (Lee).
+
+### Team Results
+
+Here we are interested in all of the sample results taken together. The 6 independent trials are binomially distributed with $n = 20$ and $p= 0.5$.
+
+```{r}
 ggplot(resultsdf, mapping = aes(name, heads)) + geom_bar(stat = "identity", fill = "steelblue") + labs(x=NULL, y="Number of Heads", title = "Head Counts per Sample") + geom_hline(yintercept = 10, colour = "light gray", size = 1) + theme_minimal()
 
 summary(resultsdf$heads)
+
+sampleMean <- mean(resultsdf$heads)
+sampleErr <- sqrt(((10 - sampleMean)^2)/6)
 ```
 
-Here we are interested in the number of heads that appear and each of the 6 independent trials are binomially distributed with $n = 20$ and $p= 0.5$. Our sample mean $\bar{x}=$ `r sampleMean` and sample error is $\sigma_{\bar{x}} =$ `r sampleErr`.
+Our sample mean and sample error are :
+
+* $\bar{x}=$ `r format(sampleMean, digits=3)`  
+* $\sigma_{\bar{x}} =$ `r format(sampleErr, digits = 3)`
+
+At a confidence level of 0.95, our intervals are `r format(sampleMean - 2*sampleErr, digits = 3)` and `r format(sampleMean + 2*sampleErr, digits = 3)`.
+
+## Conclusion
+
+By taking all of the samples together we have significantly decreased our sample error. In fact, no individual experiment could produce an error less than `r  format(sampleErr, digits = 3)`. However the expected value of the experiment should've produced a mean of $\mu = 10$. Even with 6 total samples, our experiment was still 3 standard deviations away from the expected value. To increase the accuracy of the experiment, we could increase the number of samples by asking more people to repeat the experiment independently. We will avoid including more coin flips per sample to increase accuracy because that would in return increase the likelihood of getting a significant effect by chance alone.
+
+For more information on this experiment, visit [The Experiment Experiment](http://www.npr.org/sections/money/2016/01/15/463237871/episode-677-the-experiment-experiment)
+
+
