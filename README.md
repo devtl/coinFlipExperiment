@@ -1,7 +1,9 @@
 # coinFlipExperiment
 
 This is a simple experiment designed for project one of my Applied Statistics course, Fall 2017. 
+
 For more information on this experiment, visit [The Experiment Experiment](http://www.npr.org/sections/money/2016/01/15/463237871/episode-677-the-experiment-experiment)
+
 
 Many times published experiments are not repeated due to various reasons (ie. limited resources, not as distinguished as original results, etc.). In addition, the experiments that are published in peer-reviewed journals are sometimes biased by the researcher's need for "significant results" instead of those that agree with natural law or known experiments which are usually considered "boring" or "uninteresting" and are subject to the file-drawer effect. This creates a problem of having too many remarkable studies published with non-realistic outcomes.
 
